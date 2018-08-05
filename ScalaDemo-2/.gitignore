@@ -1,0 +1,6 @@
+/bin/
+*.class
+*.cache*
+*target*
+*.eclipse.*
+*scala-ide*
