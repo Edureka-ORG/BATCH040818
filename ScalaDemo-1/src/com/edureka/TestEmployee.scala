@@ -27,29 +27,65 @@ object TestEmployee
     sureshObj.id = 234566;
 //    saiObj.org = "Wipro";
     sureshObj.name = "SURESH"
-    saiObj.email="suresh@wipro.com"
-    saiObj.deptno=3
+    sureshObj.email="suresh@wipro.com"
+    sureshObj.deptno=3
 //    saiObj.location = "NANAKRAMGUDA"
-    saiObj.doj=2000;
-    saiObj.skillSet += "PHP"
-    saiObj.skillSet += "SCALA"
-    saiObj.skillSet += "GITHUB"
-    saiObj.skillSet += "ORACLE"
+    sureshObj.doj=2000;
+    sureshObj.skillSet += "PHP"
+    sureshObj.skillSet += "SCALA"
+    sureshObj.skillSet += "GITHUB"
+    sureshObj.skillSet += "ORACLE"
     
     println(sureshObj);
     
     
     
-    var x = 10 + 20 
+    if(saiObj.doj < 2015){
+      println("senior developer");
+    }else{
+      println("Junior developer");
+    }
+    
+    
+    
+    var x = 5 
     
     var y = {
-      var a = 10;
-      var b = 20; 
-      a+b
+      var a = 10;var b = 20; 
+      println(a+b)
       }
-    
-    
+    println("AFTER BLOCK");
     println(y)
+    
+    val s = if( x > 0 && x < 6) 0 else -1
+    
+    var marks = Array(35,45,55)
+    
+    for (subjectMarks <- marks)
+    {
+      println(subjectMarks)
+    }
+    
+    for( skill <- saiObj.skillSet)
+    {
+      println(skill)
+    }
+    
+    for ( i <- 0 until sureshObj.skillSet.length){
+      
+      println(sureshObj.skillSet(i))
+    }
+    
+    val fn = (x:String) => println(x)
+    
+    saiObj.skillSet.foreach(skill => fn(skill))
+    
+    
+    for( skill <- saiObj.skillSet ; sureshSkill <- sureshObj.skillSet)
+    {
+      println(skill)
+      println(sureshSkill)
+    }
     
     
   }
