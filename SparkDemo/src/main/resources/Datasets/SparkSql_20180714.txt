@@ -1,0 +1,95 @@
+Today Topic:
+
+We have a collection of objects, want to run sql queries
+
+Creating Dataset
+
+case class Person(name: String, age: Long)
+
+val persons = Seq(Person("Michael", 29), Person("Andy", 30), Person("Justin", 19))
+
+ val personDS = persons.toDs  <--- toDS will not present by default, using imlicits
+ 
+ val personDS = spark.createDataset(persons)
+ 
+ val primitiveDS = Seq(1, 2, 3).toDS()
+
+ primitiveDS.map(_ + 1).collect()
+ 
+ Converting dataframes to dataset
+ 
+ val peopleJson = "file:///E:/SAIWS/SCALA/ProjectWS/Datasets/people.json"
+  val peopleDF = spark.read.json(peopleJson)
+  
+  val peopleDS = peopleDF.as[People]
+  
+  
+  Encoders : Useful for serializaing and deserializing the objects.
+  The most important point is we can read data without deserializaing object
+  
+  
+  val input = "file:///E:/SAIWS/SCALA/ProjectWS/Datasets/people.txt"
+  
+   val peopleRDD = spark.sparkContext.textFile(input)
+   
+   val peopleArray = peopleRDD.map(iLine => iLine.split(","))
+   
+    case class People(name:String, age:Int)
+	
+	val peopleCaseClass = peopleArray.map(attributes => People(attributes(0),attributes(1).trim.toInt))
+	
+	val pf = spark.createDataFrame(peopleCaseClass)
+	or
+	 val pf =  peopleCaseClass.toDF
+	 
+	 pf.createOrReplaceTempView("people")
+	 
+	 val teenagersDF = spark.sql("SELECT name, age FROM people WHERE age BETWEEN 13 AND 19")
+
+	 teenagersDF.map(teenager => "Name: " + teenager(0)).show()
+
+	 teenagersDF.map(teenager => teenager.getValuesMap[Any](List("name", "age"))).collect()
+<console>:22: error: Unable to find encoder for type stored in a Dataset.  Primitive types (Int, String, etc) and Product types (case classes) are supported by importing spark.implicits._  Support for serializing other types will be added in future releases.
+       teenagersDF.map(teenager => teenager.getValuesMap[Any](List("name", "age"))).collect()
+ 
+ import spark.implicits._
+ 
+ implicit val mapEncoder = org.apache.spark.sql.Encoders.kryo[Map[String, Any]]
+ 
+ teenagersDF.map(teenager => teenager.getValuesMap[Any](List("name", "age"))).collect()
+ 
+ 
+ 
+ programitically specifiing the schema
+ 
+ 
+ val input = "file:///E:/SAIWS/SCALA/ProjectWS/Datasets/people.txt"
+ 
+ import org.apache.spark.sql.types._
+
+ 
+ val schemaString = "name age"
+ 
+ val fields = schemaString.split(" ").map(fieldName => StructField(fieldName, StringType, nullable = true))
+
+ val peopleRDD = spark.sparkContext.textFile(input)
+ 
+ import org.apache.spark.sql._
+ 
+val rowRDD = peopleRDD.map(_.split(",")).map(attributes => Row(attributes(0), attributes(1).trim)) 
+val peopleDF = spark.createDataFrame(rowRDD, schema)
+
+spark sql by default load parquet --> modify if needed spark.sql.sources.default
+
+val usersDF = spark.read.load("file:///E:/SAIWS/SCALA/ProjectWS/Datasets//users.parquet")
+
+
+val peopleDF = spark.read.format("json").load("file:///E:/SAIWS/SCALA/ProjectWS/Datasets/people.json")
+peopleDF.select("name", "age").write.format("parquet").save("namesAndAges.parquet")
+
+
+val peopleDFCsv = spark.read.format("csv").option("sep", ";").option("inferSchema", "true").option("header", "true").load("file:///E:/SAIWS/SCALA/ProjectWS/Datasets/people.csv")
+
+
+
+ 
